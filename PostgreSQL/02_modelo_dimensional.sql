@@ -97,6 +97,10 @@ CREATE TABLE dw.dim_clasificacion_incidencia (
     )
 );
 
+CREATE TABLE dw.dim_motivo_devolucion (
+    sk_motivo_devolucion SERIAL PRIMARY KEY,
+    motivo_devolucion VARCHAR(30) NOT NULL UNIQUE
+);
 -- =====================================================
 -- TABLAS DE HECHOS
 -- =====================================================
@@ -115,6 +119,7 @@ CREATE TABLE dw.fact_envio (
     sk_transportista INT NOT NULL,
     sk_ruta INT NOT NULL,
     sk_tipo_envio INT NOT NULL,
+    sk_motivo_devolucion INT,
 
     estado_envio VARCHAR(15) NOT NULL,
 
@@ -167,6 +172,10 @@ CREATE TABLE dw.fact_envio (
         FOREIGN KEY (sk_tipo_envio)
         REFERENCES dw.dim_tipo_envio (sk_tipo_envio),
 
+    CONSTRAINT fk_fact_envio_motivo_devolucion
+        FOREIGN KEY (sk_motivo_devolucion)
+        REFERENCES dw.dim_motivo_devolucion (sk_motivo_devolucion),
+
     CONSTRAINT ck_fact_envio_estado
         CHECK (estado_envio IN (
             'registrado',
@@ -203,7 +212,8 @@ CREATE TABLE dw.fact_envio (
 
     CONSTRAINT ck_fact_envio_monto_reembolso
         CHECK (monto_reembolso IS NULL OR monto_reembolso >= 0)
-);
+); 
+
 
 CREATE TABLE dw.fact_incidencia (
     sk_fact_incidencia SERIAL PRIMARY KEY,
